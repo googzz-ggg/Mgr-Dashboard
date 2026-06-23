@@ -1,0 +1,221 @@
+{
+  "generatedAt": "2026-06-23T06:43:24.097Z",
+  "sourceFiles": {
+    "sales": "MBL_Raw_Data_W19_W22.xlsx",
+    "attendance": "attend_start_end_per_store_May2026.xlsx"
+  },
+  "regions": {
+    "Cairo": {
+      "salesScore": 100,
+      "coverageScore": 99,
+      "performance": 99,
+      "salesValueM": 1300.2,
+      "units": 72514,
+      "shops": 1367,
+      "shopsWithAttendance": 1357,
+      "attendanceGap": 10,
+      "attendanceGapShopCodes": [
+        "S-0016-002",
+        "S-0119-003",
+        "S-0575-003",
+        "S-13554-002",
+        "S-13856-001",
+        "S-13857-001",
+        "S-4901-001",
+        "S-5037-001",
+        "S-5472-001",
+        "S-6396-001"
+      ],
+      "multiStaffCases": 935,
+      "attendanceRows": 8619
+    },
+    "Delta": {
+      "salesScore": 46,
+      "coverageScore": 100,
+      "performance": 87,
+      "salesValueM": 601.8,
+      "units": 49198,
+      "shops": 995,
+      "shopsWithAttendance": 995,
+      "attendanceGap": 0,
+      "attendanceGapShopCodes": [],
+      "multiStaffCases": 770,
+      "attendanceRows": 6878
+    },
+    "Alexandria": {
+      "salesScore": 34,
+      "coverageScore": 97,
+      "performance": 81,
+      "salesValueM": 443.9,
+      "units": 27325,
+      "shops": 645,
+      "shopsWithAttendance": 625,
+      "attendanceGap": 20,
+      "attendanceGapShopCodes": [
+        "S-0415-002",
+        "S-0415-003",
+        "S-0416-004",
+        "S-0417-001",
+        "S-11570-001",
+        "S-12360-001",
+        "S-12360-002",
+        "S-12987-001",
+        "S-13390-001",
+        "S-13484-001",
+        "S-13845-001",
+        "S-14016-001",
+        "S-14061-001",
+        "S-1719-001",
+        "S-1731-001",
+        "S-1733-001",
+        "S-5790-001",
+        "S-5790-003",
+        "S-6293-001",
+        "S-6605-001"
+      ],
+      "multiStaffCases": 402,
+      "attendanceRows": 3858
+    },
+    "Upper Egypt": {
+      "salesScore": 30,
+      "coverageScore": 99,
+      "performance": 82,
+      "salesValueM": 387,
+      "units": 38718,
+      "shops": 1004,
+      "shopsWithAttendance": 996,
+      "attendanceGap": 8,
+      "attendanceGapShopCodes": [
+        "S-10115-001",
+        "S-1040-001",
+        "S-12343-001",
+        "S-12798-001",
+        "S-4236-001",
+        "S-5299-001",
+        "S-5328-001",
+        "S-6522-001"
+      ],
+      "multiStaffCases": 707,
+      "attendanceRows": 6868
+    }
+  },
+  "networkWide": {
+    "activeShops": 3973,
+    "totalShopsInSalesData": 4011,
+    "employees": 843,
+    "totalRevenue": 2732872843,
+    "totalUnits": 187755,
+    "totalMultiStaffCases": 5368,
+    "shopsWithSalesNoAttendance": 38
+  },
+  "topBrandsByRevenue": [
+    [
+      "Samsung",
+      1175162384
+    ],
+    [
+      "Oppo",
+      512631866
+    ],
+    [
+      "Apple",
+      366608660
+    ],
+    [
+      "Xiaomi",
+      180218917
+    ],
+    [
+      "Realme",
+      150988340
+    ]
+  ],
+  "weeklyRevenue": {
+    "W19": 732166790,
+    "W20": 722145671,
+    "W21": 681432804,
+    "W22": 597127578
+  },
+  "topShopsByRevenue": [
+    [
+      "S-0074-006",
+      63398321
+    ],
+    [
+      "S-0074-005",
+      63090168
+    ],
+    [
+      "S-0074-020",
+      51674556
+    ],
+    [
+      "S-0074-011",
+      51050570
+    ],
+    [
+      "S-0074-012",
+      49522494
+    ],
+    [
+      "S-0074-008",
+      49207560
+    ],
+    [
+      "S-0074-018",
+      47770879
+    ],
+    [
+      "S-0074-024",
+      44800530
+    ],
+    [
+      "S-0074-019",
+      44042678
+    ],
+    [
+      "S-0074-014",
+      40579754
+    ],
+    [
+      "S-0074-022",
+      39900325
+    ],
+    [
+      "S-0074-013",
+      37689348
+    ],
+    [
+      "S-0074-009",
+      37110555
+    ],
+    [
+      "S-0074-017",
+      35535201
+    ],
+    [
+      "S-0074-015",
+      35291071
+    ],
+    [
+      "S-0074-023",
+      30813302
+    ],
+    [
+      "S-0074-021",
+      27228574
+    ],
+    [
+      "S-0074-025",
+      24476449
+    ],
+    [
+      "S-0074-010",
+      21758567
+    ],
+    [
+      "S-0074-003",
+      20841654
+    ]
+  ]
+}
