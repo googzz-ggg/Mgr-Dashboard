@@ -8,12 +8,17 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "messages array is required" }, { status: 400 });
     }
 
+    const apiKey = process.env.ANTHROPIC_API_KEY;
+    if (!apiKey) {
+      return NextResponse.json({ error: "Missing ANTHROPIC_API_KEY" }, { status: 500 });
+    }
+
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         "anthropic-version": "2023-06-01",
-        "anthropic-dangerous-direct-browser-access": "true",
+        "x-api-key": apiKey,
       },
       body: JSON.stringify({
         model: "claude-sonnet-4-6",
@@ -33,8 +38,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Anthropic streams using SSE with event: content_block_delta
-    // We transform it to OpenAI-compatible format for the client
+    // Transform Anthropic SSE → OpenAI-compatible SSE so NexusCopilot client works unchanged
     const encoder = new TextEncoder();
     const transformedStream = new ReadableStream({
       async start(controller) {
@@ -59,14 +63,9 @@ export async function POST(request: NextRequest) {
 
               try {
                 const parsed = JSON.parse(data);
-                // Anthropic delta events
                 if (parsed.type === "content_block_delta" && parsed.delta?.type === "text_delta") {
-                  const text = parsed.delta.text;
-                  // Re-emit as OpenAI-compatible SSE so the client works unchanged
-                  const openAIChunk = JSON.stringify({
-                    choices: [{ delta: { content: text } }],
-                  });
-                  controller.enqueue(encoder.encode(`data: ${openAIChunk}\n\n`));
+                  const chunk = JSON.stringify({ choices: [{ delta: { content: parsed.delta.text } }] });
+                  controller.enqueue(encoder.encode(`data: ${chunk}\n\n`));
                 }
                 if (parsed.type === "message_stop") {
                   controller.enqueue(encoder.encode("data: [DONE]\n\n"));

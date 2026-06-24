@@ -232,30 +232,37 @@ const NexusCopilot = forwardRef<NexusCopilotHandle, NexusCopilotProps>(function 
       abortRef.current = controller;
 
       try {
+        const systemPrompt = [
+          "You are Nexus Prime, elite retail intelligence AI for 4000+ mobile shops in Egypt.",
+          "Ground every answer in the live dashboard snapshot provided below — cite real numbers from it exactly as given, never invent or round differently.",
+          "",
+          "FORMAT RULES (follow exactly):",
+          "1. When answering about a region's metrics, present them as a markdown table with columns: Metric | Value. Rows must use these exact labels in this order: Performance, Sales, Shops, Attendance Gap, Trend — using the exact figures from the snapshot below.",
+          "2. After the table, add a short '**Quick read**' line (1 sentence).",
+          "3. If you give recommendations/actions, list them as a markdown table with columns: Action | Why it matters | Expected impact — 2-4 rows max.",
+          "4. If comparing multiple regions, use one markdown table with regions as columns and metrics as rows.",
+          "5. Never output a wall of bullets for numeric data — numbers always go in a table. Bullets are only for non-numeric commentary.",
+          "6. Keep total reply under ~150 words excluding table cells. No filler intro sentences before the table.",
+          "",
+          buildDashboardContext(selectedRegion),
+        ].join("\n");
+
+        // Route through /api/nexus (server-side) so the API key stays in .env.local
         const response = await fetch("/api/nexus", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           signal: controller.signal,
           body: JSON.stringify({
-            system: [
-              "You are Nexus Prime, elite retail intelligence AI for 4000+ mobile shops in Egypt.",
-              "Ground every answer in the live dashboard snapshot provided below — cite real numbers from it exactly as given, never invent or round differently.",
-              "",
-              "FORMAT RULES (follow exactly):",
-              "1. When answering about a region's metrics, present them as a markdown table with columns: Metric | Value. Rows must use these exact labels in this order: Performance, Sales, Shops, Attendance Gap, Trend — using the exact figures from the snapshot below.",
-              "2. After the table, add a short '**Quick read**' line (1 sentence).",
-              "3. If you give recommendations/actions, list them as a markdown table with columns: Action | Why it matters | Expected impact — 2-4 rows max.",
-              "4. If comparing multiple regions, use one markdown table with regions as columns and metrics as rows.",
-              "5. Never output a wall of bullets for numeric data — numbers always go in a table. Bullets are only for non-numeric commentary.",
-              "6. Keep total reply under ~150 words excluding table cells. No filler intro sentences before the table.",
-              "",
-              buildDashboardContext(selectedRegion),
-            ].join("\n"),
+            system: systemPrompt,
             messages: history.map((m) => ({ role: m.role, content: m.content })),
           }),
         });
 
         if (!response.ok || !response.body) {
+          const err = await response.json().catch(() => ({}));
+          if (response.status === 500 && err?.error === "Missing ANTHROPIC_API_KEY") {
+            throw new Error("NO_KEY");
+          }
           throw new Error(`Nexus API error (${response.status})`);
         }
 
@@ -281,10 +288,11 @@ const NexusCopilot = forwardRef<NexusCopilotHandle, NexusCopilotProps>(function 
             const line = rawLine.trim();
             if (!line.startsWith("data:")) continue;
             const data = line.slice(5).trim();
-            if (data === "[DONE]") continue;
+            if (!data || data === "[DONE]") continue;
 
             try {
               const parsed = JSON.parse(data);
+              // Server route re-emits as OpenAI-compat: choices[0].delta.content
               const delta: string | undefined = parsed?.choices?.[0]?.delta?.content;
               if (delta) {
                 accumulated += delta;
@@ -304,14 +312,16 @@ const NexusCopilot = forwardRef<NexusCopilotHandle, NexusCopilotProps>(function 
       } catch (err) {
         if ((err as Error).name === "AbortError") return;
         console.error("Nexus copilot error:", err);
+        const isNoKey = (err as Error).message === "NO_KEY";
         setMessages((prev) =>
           prev.map((m) =>
             m.id === assistantId
               ? {
                   ...m,
                   isError: true,
-                  content:
-                    "Nexus couldn't reach the intelligence engine just now. The intelligence engine encountered an issue. Please try again.",
+                  content: isNoKey
+                    ? "**Nexus needs an API key.** Add `ANTHROPIC_API_KEY=sk-ant-...` to your `.env.local` file, then restart the dev server. Get a key at console.anthropic.com."
+                    : "Nexus couldn't reach the intelligence engine. Please try again.",
                 }
               : m
           )
