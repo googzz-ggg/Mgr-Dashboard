@@ -13,6 +13,26 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Missing ANTHROPIC_API_KEY" }, { status: 500 });
     }
 
+    // Clean messages: only user/assistant roles, non-empty content, strictly alternating
+    const rawMessages: { role: string; content: string }[] = body.messages;
+    const cleaned: { role: "user" | "assistant"; content: string }[] = [];
+    for (const m of rawMessages) {
+      if (m.role !== "user" && m.role !== "assistant") continue;
+      const content = String(m.content ?? "").trim();
+      if (!content) continue;
+      // Enforce alternation — skip consecutive same-role messages
+      if (cleaned.length > 0 && cleaned[cleaned.length - 1].role === m.role) continue;
+      cleaned.push({ role: m.role as "user" | "assistant", content });
+    }
+    // Must start with user
+    if (cleaned.length === 0 || cleaned[0].role !== "user") {
+      return NextResponse.json({ error: "First message must be from user" }, { status: 400 });
+    }
+    // Must end with user (last turn is always the new question)
+    const finalMessages = cleaned[cleaned.length - 1].role === "user"
+      ? cleaned
+      : cleaned.slice(0, -1);
+
     const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
@@ -24,7 +44,7 @@ export async function POST(request: NextRequest) {
         model: "claude-sonnet-4-6",
         max_tokens: 1024,
         system: body.system || "You are Nexus, elite retail intelligence AI.",
-        messages: body.messages,
+        messages: finalMessages,
         stream: true,
       }),
     });
@@ -32,9 +52,10 @@ export async function POST(request: NextRequest) {
     if (!response.ok || !response.body) {
       const detail = await response.text().catch(() => "");
       console.error("Anthropic API error", response.status, detail);
+      // Return 400 details so the client can show a useful message
       return NextResponse.json(
         { error: "Anthropic API error", status: response.status, detail },
-        { status: response.status }
+        { status: 502 }  // use 502 so client knows it's an upstream error
       );
     }
 

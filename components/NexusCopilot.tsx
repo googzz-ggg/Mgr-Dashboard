@@ -263,7 +263,8 @@ const NexusCopilot = forwardRef<NexusCopilotHandle, NexusCopilotProps>(function 
           if (response.status === 500 && err?.error === "Missing ANTHROPIC_API_KEY") {
             throw new Error("NO_KEY");
           }
-          throw new Error(`Nexus API error (${response.status})`);
+          const detail = err?.detail ? ` — ${err.detail}` : "";
+          throw new Error(`Nexus API error (${response.status})${detail}`);
         }
 
         // The route streams Server-Sent Events in the OpenAI-compatible
