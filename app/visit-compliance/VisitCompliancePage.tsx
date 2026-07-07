@@ -424,7 +424,7 @@ function ScorecardModal({p,visits,storeCoverage,onClose}:{p:EmployeeProfile;visi
         <div className="absolute inset-0 rounded-2xl overflow-hidden pointer-events-none">
           <div className="absolute inset-0 opacity-[0.04]" style={{background:"repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(255,255,255,0.05) 2px,rgba(255,255,255,0.05) 4px)"}}/>
           <div className="absolute left-0 right-0 h-px opacity-20 animate-pulse" style={{background:`linear-gradient(to right,transparent,${trustColor},transparent)`,top:"25%"}}/>
-          <div className="absolute left-0 right-0 h-px opacity-10 animate-pulse" style={{background:`linear-gradient(to right,transparent,${trustColor},transparent)`,top:"70%`,animationDelay:"1s"}}/>
+          <div className="absolute left-0 right-0 h-px opacity-10 animate-pulse" style={{background:`linear-gradient(to right,transparent,${trustColor},transparent)`,top:"70%",animationDelay:"1s"}}/>
         </div>
 
         {/* Header */}
